@@ -21,7 +21,7 @@ return function (App $app) {
         
         //Se connecter au serveur de DB
         try {
-            $pdo = new PDO('mysql:host=localhost;dbname=cedllar','root','root', [
+            $pdo = new PDO('mysql:host=localhost;dbname=cellar','root','root', [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
             ]);
         
@@ -52,7 +52,186 @@ return function (App $app) {
                 ->withHeader('charset', 'utf-8');
     });
     
+    $app->get('/api/wines/{id}', function(Request $request, Response $response, array $args) {
+        $id = $args['id'];
+        
+        //Se connecter au serveur de DB
+        try {
+            $pdo = new PDO('mysql:host=localhost;dbname=cellar','root','root', [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ]);
+            //Nettoyer les données entrantes
+            $id = $pdo->quote($id,PDO::PARAM_INT);
+                    
+            //Préparer la requête
+            $query = "SELECT * FROM wine WHERE id=$id";
+        
+            //Envoyer la requête
+            $stmt = $pdo->query($query);
+
+            //Extraire les données
+            $wines = $stmt->fetch(PDO::FETCH_ASSOC);     //var_dump($wines); die;
+        } catch(PDOException $e) {
+            $wines = [
+                [
+                    "error" => "Problème de base données",
+                    "errorCode" => $e->getCode(),
+                    "errorMsg" => $e->getMessage(),
+                ]
+            ];
+        }
+        
+        //Convertir les données en JSON
+        $data = json_encode($wines);
+        
+        $response->getBody()->write($data);
+        return $response
+                ->withHeader('content-type', 'application/json')
+                ->withHeader('charset', 'utf-8');
+    });
     
+    $app->post('/api/wines', function(Request $request, Response $response) {
+        //Récupérer les données du formulaire
+        $wine = $request->getParsedBody();
+        
+        //Se connecter au serveur de DB
+        try {
+            $pdo = new PDO('mysql:host=localhost;dbname=cellar','root','root', [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ]);
+                                
+            //Définir la requête
+            $query = "INSERT INTO `wine`"
+                    . "(`id`, `name`, `year`, `grapes`, `country`, `region`, "
+                    . "`description`, `picture`) "
+                    . "VALUES (null,:name,:year,:grapes,:country, :region, "
+                    . ":description, :picture)";
+        
+            //Préparer la requête
+            $stmt = $pdo->prepare($query);
+            
+            //Exécuter la requête préparée
+            $result = $stmt->execute([
+                ':name' => $wine['name'],
+                ':year' => $wine['year'],
+                ':grapes' => $wine['grapes'],
+                ':country' => $wine['country'],
+                ':region' => $wine['region'],
+                ':description' => $wine['description'],
+                ':picture' => $wine['picture'],
+            ]);
+
+            if($result) {
+                $data = json_encode(['success'=>true]);    
+            } else {
+                $data = json_encode(['success'=>false]);
+            }   
+        } catch(PDOException $e) {
+            $data = [
+                [
+                    "error" => "Problème de base données",
+                    "errorCode" => $e->getCode(),
+                    "errorMsg" => $e->getMessage(),
+                ]
+            ];
+        }
+        
+        $response->getBody()->write($data);
+            
+        return $response->withHeader('content-type', 'application/json');
+    });
+    
+    $app->delete('/api/wines/{id}', function(Request $request, Response $response, array $args) {
+        $id = $args['id'];
+        
+        //Se connecter au serveur de DB
+        try {
+            $pdo = new PDO('mysql:host=localhost;dbname=cellar','root','root', [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ]);
+                                
+            //Définir la requête
+            $query = "DELETE FROM `wine` WHERE `id`=:id";
+        
+            //Préparer la requête
+            $stmt = $pdo->prepare($query);
+            
+            //Exécuter la requête préparée
+            $result = $stmt->execute([
+                ':id' => $id,
+            ]);
+
+            if($result) {
+                $data = json_encode(['success'=>true]);    
+            } else {
+                $data = json_encode(['success'=>false]);
+            }
+        } catch(PDOException $e) {
+            $data = [
+                [
+                    "error" => "Problème de base données",
+                    "errorCode" => $e->getCode(),
+                    "errorMsg" => $e->getMessage(),
+                ]
+            ];
+        }
+        
+        $response->getBody()->write($data);
+            
+        return $response->withHeader('content-type', 'application/json');
+    });
+    
+    $app->put('/api/wines/{id}', function(Request $request, Response $response, array $args) {
+        $id = $args['id'];
+        $content = $request->getBody()->getContents();
+        parse_str($content, $wine);
+        
+        //Se connecter au serveur de DB
+        try {
+            $pdo = new PDO('mysql:host=localhost;dbname=cellar','root','root', [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ]);
+                                
+            //Définir la requête
+            $query = "UPDATE `wine` SET `name`=:name, `year`=:year, "
+                    . "`grapes`=:grapes, `country`=:country, `region`=:region, "
+                    . "`description`=:description, `picture`=:picture "
+                    . "WHERE `id`=:id";
+        
+            //Préparer la requête
+            $stmt = $pdo->prepare($query);
+            
+            //Exécuter la requête préparée
+            $result = $stmt->execute([
+                ':id' => $id,
+                ':name' => $wine['name'],
+                ':year' => $wine['year'],
+                ':grapes' => $wine['grapes'],
+                ':country' => $wine['country'],
+                ':region' => $wine['region'],
+                ':description' => $wine['description'],
+                ':picture' => $wine['picture'],
+            ]);
+
+            if($result) {
+                $data = json_encode(['success'=>true]);    
+            } else {
+                $data = json_encode(['success'=>false]);
+            }
+        } catch(PDOException $e) {
+            $data = [
+                [
+                    "error" => "Problème de base données",
+                    "errorCode" => $e->getCode(),
+                    "errorMsg" => $e->getMessage(),
+                ]
+            ];
+        }
+        
+        $response->getBody()->write($data);
+            
+        return $response->withHeader('content-type', 'application/json');
+    });
 
     $app->group('/users', function (Group $group) {
         $group->get('/', ListUsersAction::class);
