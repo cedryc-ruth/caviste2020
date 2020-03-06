@@ -122,9 +122,9 @@ return function (App $app) {
             ]);
 
             if($result) {
-                $data = json_encode(['success'=>true]);    
+                $data = ['success'=>true];    
             } else {
-                $data = json_encode(['success'=>false]);
+                $data = ['success'=>false];
             }   
         } catch(PDOException $e) {
             $data = [
@@ -136,6 +136,7 @@ return function (App $app) {
             ];
         }
         
+        $data = json_encode($data);
         $response->getBody()->write($data);
             
         return $response->withHeader('content-type', 'application/json');
@@ -162,9 +163,9 @@ return function (App $app) {
             ]);
 
             if($result) {
-                $data = json_encode(['success'=>true]);    
+                $data = ['success'=>true];    
             } else {
-                $data = json_encode(['success'=>false]);
+                $data = ['success'=>false];
             }
         } catch(PDOException $e) {
             $data = [
@@ -176,6 +177,7 @@ return function (App $app) {
             ];
         }
         
+        $data = json_encode($data);
         $response->getBody()->write($data);
             
         return $response->withHeader('content-type', 'application/json');
@@ -214,9 +216,9 @@ return function (App $app) {
             ]);
 
             if($result) {
-                $data = json_encode(['success'=>true]);    
+                $data = ['success'=>true];    
             } else {
-                $data = json_encode(['success'=>false]);
+                $data = ['success'=>false];
             }
         } catch(PDOException $e) {
             $data = [
@@ -228,6 +230,7 @@ return function (App $app) {
             ];
         }
         
+        $data = json_encode($data);
         $response->getBody()->write($data);
             
         return $response->withHeader('content-type', 'application/json');
