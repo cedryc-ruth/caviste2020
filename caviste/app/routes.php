@@ -139,7 +139,9 @@ return function (App $app) {
         $data = json_encode($data);
         $response->getBody()->write($data);
             
-        return $response->withHeader('content-type', 'application/json');
+        return $response
+                ->withHeader('content-type', 'application/json')
+                ->withHeader('charset', 'utf-8');
     });
     
     $app->delete('/api/wines/{id}', function(Request $request, Response $response, array $args) {
@@ -180,7 +182,9 @@ return function (App $app) {
         $data = json_encode($data);
         $response->getBody()->write($data);
             
-        return $response->withHeader('content-type', 'application/json');
+        return $response
+                ->withHeader('content-type', 'application/json')
+                ->withHeader('charset', 'utf-8');
     });
     
     $app->put('/api/wines/{id}', function(Request $request, Response $response, array $args) {
@@ -233,7 +237,9 @@ return function (App $app) {
         $data = json_encode($data);
         $response->getBody()->write($data);
             
-        return $response->withHeader('content-type', 'application/json');
+        return $response
+                ->withHeader('content-type', 'application/json')
+                ->withHeader('charset', 'utf-8');
     });
 
     $app->group('/users', function (Group $group) {
