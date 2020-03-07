@@ -1,3 +1,56 @@
+function saveWine() {
+    //Création d'un objet wine
+    let wine = {};
+    
+    //Récupérer les données du formulaire et les transférer l'objet wine
+    let input = document.getElementById('idWine');
+    wine.id = input.value;
+
+    input = document.getElementById('name');
+    wine.name = input.value;
+
+    input = document.getElementById('grapes');
+    wine.grapes = input.value;
+
+    input = document.getElementById('country');
+    wine.country = input.value;
+
+    input = document.getElementById('region');
+    wine.region = input.value;
+
+    input = document.getElementById('year');
+    wine.year = input.value;
+
+    input = document.getElementById('notes');
+    wine.notes = input.innerHTML;
+
+    let imgWine = document.getElementById('picture');
+    wine.picture = imgWine.src;
+    
+    //Envoyer l'objet wine à l'API en POST ou en PUT
+    let method = (wine.id=='') ?'POST':'PUT';
+    
+    const options = {
+        'method': method,
+        'body': JSON.stringify(wine),
+        'mode': 'cors',
+        'headers': {
+            'content-type': 'application/json; charset=utf-8'
+        }
+    };
+    
+    const fetchURL = method=='PUT' ? '/wines/'+wine.id : '/wines';
+    
+    fetch(apiURL + fetchURL, options).then(function(response) {
+        if(response.ok) {
+            response.json().then(function(data){
+                console.log(data);
+                
+            });
+        }
+    });
+}
+
 function newWine() {
     //Vider le formulaire
     let input = document.getElementById('idWine');
@@ -96,11 +149,11 @@ function getWine(id, wines) {
         : 'images/pics/No_picture_available.png';
 }
 
+const apiURL = 'http://localhost:8888/api';          //'js/wines.json';  //Mock
 const picturesURL = 'http://localhost/caviste2020/caviste/public/pics/';
 let wines;
 
 window.onload = function() {
-    const apiURL = 'http://localhost:8888/api';          //'js/wines.json';  //Mock
     const options = {
         'method':'GET'
     };
@@ -139,5 +192,8 @@ window.onload = function() {
     
     let btNewWine = document.getElementById('btNewWine');
     btNewWine.addEventListener('click', () => newWine());
+    
+    let btSave = document.getElementById('btSave');
+    btSave.addEventListener('click', () => saveWine());
 };
 

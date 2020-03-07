@@ -227,8 +227,15 @@ return function (App $app) {
     
     $app->put('/api/wines/{id}', function(Request $request, Response $response, array $args) {
         $id = $args['id'];
+        
+        var_dump($request->getBody());die;
+        
         $content = $request->getBody()->getContents();
+        //$content = stripcslashes($content);
         parse_str($content, $wine);
+        
+        $response->getBody()->write(json_encode($content));
+        return $response;
         
         //Se connecter au serveur de DB
         try {
@@ -278,11 +285,15 @@ return function (App $app) {
         return $response
                 ->withHeader('content-type', 'application/json')
                 ->withHeader('charset', 'utf-8');
-    });
-
+    })->add(new \App\Application\Middleware\CorsMiddleware());
+   
     $app->group('/users', function (Group $group) {
         $group->get('/', ListUsersAction::class);
         $group->get('/{id}', ViewUserAction::class);
+    });
+    
+    $app->options('/{routes:.+}', function(Request $request, Response $response, array $args) {
+        return $response;
     });
     
 };
