@@ -60,7 +60,7 @@ function search() {
     
     //Filtrer la liste des vins sur base du keyword
     const regex = new RegExp(keyword, 'i');
-    let filteredWines = wines.filter(wine => wine.name.search(regex)!=-1);
+    let filteredWines = wines.filter(wine => wine.name && wine.name.search(regex)!=-1);
 
     //Afficher les vins dans le UL liste
     showListe(filteredWines);
@@ -88,24 +88,30 @@ function getWine(id, wines) {
     input.value = wine.year;
 
     input = document.getElementById('notes');
-    input.innerHTML = wine.notes;
+    input.innerHTML = wine.description;
 
     let imgWine = document.getElementById('picture');
-    imgWine.src = 'images/'+wine.picture;
+    imgWine.src = wine.picture!='' 
+        ? picturesURL + wine.picture
+        : 'images/pics/No_picture_available.png';
 }
 
+const picturesURL = 'http://localhost/caviste2020/caviste/public/pics/';
 let wines;
 
 window.onload = function() {
-    const apiURL = 'js/wines.json';
+    const apiURL = 'http://localhost:8888/api';          //'js/wines.json';  //Mock
     const options = {
         'method':'GET'
     };
     
-    fetch(apiURL, options).then(function(response) {
+    fetch(apiURL + '/wines', options).then(function(response) {
         if(response.ok) {
             response.json().then(function(data){
                 wines = data;
+                
+                //Afficher la liste des vins dans UL liste
+                showListe(wines);
             });
         }
     });
