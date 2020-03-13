@@ -9,6 +9,8 @@ use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
 
 return function (App $app) {
+    
+    
     $app->get('/', function (Request $request, Response $response) {
         var_dump($request);
         $response->getBody()->write('Géniaaal!');
@@ -228,7 +230,7 @@ return function (App $app) {
     $app->put('/api/wines/{id}', function(Request $request, Response $response, array $args) {
         $id = $args['id'];
         
-        var_dump($request->getBody());die;
+        //var_dump($request->getBody());die;
         
         $content = $request->getBody()->getContents();
         //$content = stripcslashes($content);
@@ -292,9 +294,9 @@ return function (App $app) {
         $group->get('/{id}', ViewUserAction::class);
     });
     
-    $app->options('/{routes:.+}', function(Request $request, Response $response, array $args) {
+    $app->options('/api/wines/{id}', function(Request $request, Response $response, array $args) {
         return $response;
     });
-    
+
 };
 
