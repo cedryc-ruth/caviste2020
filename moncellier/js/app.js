@@ -149,7 +149,7 @@ function getWine(id, wines) {
         : 'images/pics/No_picture_available.png';
 }
 
-const apiURL = 'http://caviste.localhost/';          //'js/wines.json';  //Mock
+const apiURL = 'http://caviste.localhost/api';          //'js/wines.json';  //Mock
 const picturesURL = 'http://localhost/caviste2020/caviste/public/pics/';
 let wines;
 

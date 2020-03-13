@@ -7,10 +7,10 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Interfaces\RouteCollectorProxyInterface as Group;
+use RedBeanPHP\R;
+use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 
-return function (App $app) {
-    
-    
+return function (App $app) {    
     $app->get('/', function (Request $request, Response $response) {
         var_dump($request);
         $response->getBody()->write('Géniaaal!');
@@ -18,23 +18,14 @@ return function (App $app) {
     });
     
     $app->get('/api/wines', function(Request $request, Response $response) {
-        //Récupérer les données de la BD
-        //$data = include('public/wines.json');     //Mock
-        
-        //Se connecter au serveur de DB
-        try {
-            $pdo = new PDO('mysql:host=localhost;dbname=cellar','root','root', [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]);
-        
-            //Préparer la requête
-            $query = 'SELECT * FROM wine';
-        
-            //Envoyer la requête
-            $stmt = $pdo->query($query);
-
-            //Extraire les données
-            $wines = $stmt->fetchAll(PDO::FETCH_ASSOC);     //var_dump($wines); die;
+        //Récupérer les données de la BD  
+        try {        
+            //Préparer la requête//Envoyer la requête//Extraire les données
+            $result = R::findAll('wine', ' ORDER BY name');
+            
+            foreach($result as $bean) {
+                $wines[] = $bean;
+            }
         } catch(PDOException $e) {
             $wines = [
                 [
@@ -47,7 +38,7 @@ return function (App $app) {
         
         //Convertir les données en JSON
         $data = json_encode($wines);
-        
+        //var_dump($data);die;
         $response->getBody()->write($data);
         return $response
                 ->withHeader('content-type', 'application/json')
@@ -59,20 +50,9 @@ return function (App $app) {
         
         //Se connecter au serveur de DB
         try {
-            $pdo = new PDO('mysql:host=localhost;dbname=cellar','root','root', [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]);
-            //Nettoyer les données entrantes
-            $id = $pdo->quote($id,PDO::PARAM_INT);
-                    
-            //Préparer la requête
-            $query = "SELECT * FROM wine WHERE id=$id";
-        
-            //Envoyer la requête
-            $stmt = $pdo->query($query);
-
-            //Extraire les données
-            $wines = $stmt->fetch(PDO::FETCH_ASSOC);     //var_dump($wines); die;
+            $result = R::load('wine', $id);
+            
+            $wines = [$result];
         } catch(PDOException $e) {
             $wines = [
                 [
@@ -97,20 +77,9 @@ return function (App $app) {
         
         //Se connecter au serveur de DB
         try {
-            $pdo = new PDO('mysql:host=localhost;dbname=cellar','root','root', [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]);
-            //Nettoyer les données entrantes
-            $id = $pdo->quote($keyword,PDO::PARAM_STR);
-                    
-            //Préparer la requête
-            $query = "SELECT * FROM wine WHERE name LIKE '%$keyword%'";
-        
-            //Envoyer la requête
-            $stmt = $pdo->query($query);
-
-            //Extraire les données
-            $wines = $stmt->fetchAll(PDO::FETCH_ASSOC);     //var_dump($wines); die;
+            $result = R::findAll('wine', 'name LIKE ?',["%$keyword%"]);
+            
+            $wines = [$result];
         } catch(PDOException $e) {
             $wines = [
                 [
@@ -128,7 +97,7 @@ return function (App $app) {
         return $response
                 ->withHeader('content-type', 'application/json')
                 ->withHeader('charset', 'utf-8');
-    });
+    })->add(RedBeanPHPMiddleware::class);
     
     $app->post('/api/wines', function(Request $request, Response $response) {
         //Récupérer les données du formulaire
