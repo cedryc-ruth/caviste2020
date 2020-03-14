@@ -11,5 +11,5 @@ return function (App $app) {
     
     $app->add(RedBeanPHPMiddleware::class);
     
-    $app->add(CorsMiddleware::class);
+    //$app->add(CorsMiddleware::class);
 };

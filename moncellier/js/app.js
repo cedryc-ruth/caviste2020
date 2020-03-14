@@ -22,7 +22,7 @@ function saveWine() {
     wine.year = input.value;
 
     input = document.getElementById('notes');
-    wine.notes = input.innerHTML;
+    wine.description = input.innerHTML;
 
     let imgWine = document.getElementById('picture');
     wine.picture = imgWine.src;
@@ -149,7 +149,7 @@ function getWine(id, wines) {
         : 'images/pics/No_picture_available.png';
 }
 
-const apiURL = 'http://caviste.localhost/api';          //'js/wines.json';  //Mock
+const apiURL = 'http://localhost:8888/api';          //'js/wines.json';  //Mock
 const picturesURL = 'http://localhost/caviste2020/caviste/public/pics/';
 let wines;
 
