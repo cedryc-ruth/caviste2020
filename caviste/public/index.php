@@ -7,6 +7,8 @@ use App\Application\ResponseEmitter\ResponseEmitter;
 use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
 use Slim\Factory\ServerRequestCreatorFactory;
+use Slim\Views\Twig;
+use Slim\Views\TwigMiddleware;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -47,6 +49,14 @@ $routes($app);
 
 /** @var bool $displayErrorDetails */
 $displayErrorDetails = $container->get('settings')['displayErrorDetails'];
+
+
+// Set view in Container
+$container->set('view', function() {
+    return Twig::create(__DIR__ .'/../src/templates', [
+        'cache' => __DIR__ . '/../var/cache'
+    ]);
+});
 
 // Create Request object from globals
 $serverRequestCreator = ServerRequestCreatorFactory::create();

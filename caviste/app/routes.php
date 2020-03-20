@@ -15,9 +15,17 @@ use Monolog\Handler\StreamHandler;
 
 return function (App $app) {    
     $app->get('/', function (Request $request, Response $response) {
-        var_dump($request);
-        $response->getBody()->write('Géniaaal!');
-        return $response;
+        
+        //var_dump($this->get('view'));
+        
+        $data = 'Bonjour';
+        $title = 'Accueil';
+        //$response->getBody()->write('ok');
+        
+        return $this->get('view')->render($response, 'catalogue.php',[
+            'data' => $data,
+            'title' => $title,
+        ]);
     });
     
     $app->get('/api/wines', function(Request $request, Response $response) {
