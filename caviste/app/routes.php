@@ -12,33 +12,13 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use App\Application\Middleware\CorsMiddleware;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use App\Application\Controllers\WineController;
 
 return function (App $app) {  
      define( 'REDBEAN_MODEL_PREFIX', 'App\\Application\\Models\\' );
              
-    $app->get('/', function (Request $request, Response $response) {
-        //var_dump($this->get('view'));die;
-                
-        $title = 'Liste des vins';
-        $data = "Bonjour avec Twig et ça marche!";
-        
-        $vin = R::load('wine',30);
-        $vin->name = 'Bouteille';
-        $vin->year = 2019;
-        R::store($vin);         //OK car year n'est pas null
-        
-        $vin = R::load('wine',31);
-        $vin->name = 'Bouteille';
-        $vin->year = null;
-        //R::store($vin);         //Echéc car year est null (voir Models/Wine)
-        
-        return $this->get('view')->render($response, 'Wine/index.html.twig',[
-            'title' => $title,
-            'data' => $data,
-            'vin' => $vin,
-        ]);
-        
-    });
+    $app->get('/', WineController::class.':index');
+    $app->get('/show/{id}', WineController::class.':show');
     
     $app->get('/api/wines', function(Request $request, Response $response) {
         //Récupérer les données de la BD  
