@@ -1,0 +1,14 @@
+{# empty Twig template #}
+{% extends 'layout.html.twig' %}
+
+{% block title %}Liste des vins{% endblock%}
+
+{% block content %}
+<h1>{{ title|upper }}</h1>
+<p>{{ data }}</p>
+<div>{{ vin }}</div>
+{% endblock %}
+
+{% block footer %}
+    <p>&copy; EPFC - 2020</p>
+{% endblock %}

@@ -7,6 +7,7 @@ use App\Application\ResponseEmitter\ResponseEmitter;
 use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
 use Slim\Factory\ServerRequestCreatorFactory;
+use Slim\Views\Twig;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -31,6 +32,15 @@ $repositories($containerBuilder);
 
 // Build PHP-DI Container instance
 $container = $containerBuilder->build();
+
+//Ajout de Twig view
+$container->set('view', function() {
+    return Twig::create(__DIR__.'/../src/templates', [
+        'cache' => __DIR__.'/../cache',
+        'auto_reload' => true,
+        'debug' => true
+    ]);
+});
 
 // Instantiate the app
 AppFactory::setContainer($container);

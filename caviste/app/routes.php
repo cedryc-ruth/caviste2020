@@ -15,9 +15,23 @@ use Monolog\Handler\StreamHandler;
 
 return function (App $app) {    
     $app->get('/', function (Request $request, Response $response) {
-        var_dump($request);
-        $response->getBody()->write('Géniaaal!');
-        return $response;
+        //var_dump($this->get('view'));die;
+        define( 'REDBEAN_MODEL_PREFIX', '' );
+                
+        $title = 'Liste des vins';
+        $data = "Bonjour avec Twig et ça marche!";
+        
+        $vin = R::load('wine',31);
+        $vin->name = 'Bouteille';
+        $vin->year = null;
+        R::store($vin);
+        
+        return $this->get('view')->render($response, 'Wine/index.html.twig',[
+            'title' => $title,
+            'data' => $data,
+            'vin' => $vin,
+        ]);
+        
     });
     
     $app->get('/api/wines', function(Request $request, Response $response) {
