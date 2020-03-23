@@ -104,37 +104,32 @@ return function (App $app) {
     
     $app->post('/api/wines', function(Request $request, Response $response) {
         //Récupérer les données du formulaire
-        $wine = $request->getParsedBody();
+        $content = $request->getBody()->getContents();
+        $wine = json_decode($content, true);
         
+        $log = new Logger('name');
+        $log->pushHandler(new StreamHandler('debug.log', Logger::WARNING));
+        
+        //$log->warning(implode('-',$wine)); die;
         //Se connecter au serveur de DB
         try {
-            $pdo = new PDO('mysql:host=localhost;dbname=cellar','root','root', [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]);
-                                
-            //Définir la requête
-            $query = "INSERT INTO `wine`"
-                    . "(`id`, `name`, `year`, `grapes`, `country`, `region`, "
-                    . "`description`, `picture`) "
-                    . "VALUES (null,:name,:year,:grapes,:country, :region, "
-                    . ":description, :picture)";
-        
-            //Préparer la requête
-            $stmt = $pdo->prepare($query);
+            //Créer un nouveau vin (bean)
+            $newWine = R::dispense('wine');
             
-            //Exécuter la requête préparée
-            $result = $stmt->execute([
-                ':name' => $wine['name'],
-                ':year' => $wine['year'],
-                ':grapes' => $wine['grapes'],
-                ':country' => $wine['country'],
-                ':region' => $wine['region'],
-                ':description' => $wine['description'],
-                ':picture' => $wine['picture'],
-            ]);
+            //Modifier le vin
+            $newWine->name = $wine['name'];
+            $newWine->year = $wine['year'];
+            $newWine->grapes = $wine['grapes'];
+            $newWine->country = $wine['country'];
+            $newWine->region = $wine['region'];
+            $newWine->description = $wine['description'];
+            $newWine->picture = substr(strrchr($wine['picture'],'/'),1);
+            
+            //Sauvegarder dans la DB le vin modifié
+            $insertedId = R::store($newWine);
 
-            if($result) {
-                $data = ['success'=>true];    
+            if($insertedId) {
+                $data = ['success'=>true, 'id'=>$insertedId];    
             } else {
                 $data = ['success'=>false];
             }   
@@ -154,30 +149,20 @@ return function (App $app) {
         return $response
                 ->withHeader('content-type', 'application/json')
                 ->withHeader('charset', 'utf-8');
-    });
+    })->add(new CorsMiddleware());
     
     $app->delete('/api/wines/{id}', function(Request $request, Response $response, array $args) {
         $id = $args['id'];
         
         //Se connecter au serveur de DB
         try {
-            $pdo = new PDO('mysql:host=localhost;dbname=cellar','root','root', [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]);
-                                
-            //Définir la requête
-            $query = "DELETE FROM `wine` WHERE `id`=:id";
-        
-            //Préparer la requête
-            $stmt = $pdo->prepare($query);
+            //Rechercher le vin dans la DB
+            $selectedWine = R::load('wine', $id);
             
-            //Exécuter la requête préparée
-            $result = $stmt->execute([
-                ':id' => $id,
-            ]);
-
-            if($result) {
-                $data = ['success'=>true];    
+            if($selectedWine->id) {
+                //Supprimer le vin de la DB
+                R::trash($selectedWine);
+                $data = ['success'=>true];
             } else {
                 $data = ['success'=>false];
             }
@@ -197,7 +182,7 @@ return function (App $app) {
         return $response
                 ->withHeader('content-type', 'application/json')
                 ->withHeader('charset', 'utf-8');
-    });
+    })->add(new CorsMiddleware());
     
     $app->put('/api/wines/{id}', function(Request $request, Response $response, array $args) {
         $log = new Logger('name');
@@ -207,41 +192,31 @@ return function (App $app) {
         
         $content = $request->getBody()->getContents();
         $wine = json_decode($content, true);
-        
+
         //file_put_contents('debug.log', implode('-',array_keys($wine)));
         //file_put_contents('debug.log', implode('-',$wine),FILE_APPEND);
         
         //Se connecter au serveur de DB
         try {
-            $pdo = new PDO('mysql:host=localhost;dbname=cellar','root','root', [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-            ]);
-                     
-            //Définir la requête
-            $query = "UPDATE `wine` SET `name`=:name, `year`=:year, "
-                    . "`grapes`=:grapes, `country`=:country, `region`=:region, "
-                    . "`description`=:description, `picture`=:picture "
-                    . "WHERE `id`=:id";
-        
-            //Préparer la requête
-            $stmt = $pdo->prepare($query);
+            //Rechercher dans la DB le vin par id
+            $selectedWine = R::load('wine', $id);
             
-            //Exécuter la requête préparée
-            $result = $stmt->execute([
-                ':id' => $id,
-                ':name' => $wine['name'],
-                ':year' => $wine['year'],
-                ':grapes' => $wine['grapes'],
-                ':country' => $wine['country'],
-                ':region' => $wine['region'],
-                ':description' => $wine['description'],
-                ':picture' => $wine['picture'],
-            ]);
+            //Modifier le vin
+            $selectedWine->name = $wine['name'];
+            $selectedWine->year = $wine['year'];
+            $selectedWine->grapes = $wine['grapes'];
+            $selectedWine->country = $wine['country'];
+            $selectedWine->region = $wine['region'];
+            $selectedWine->description = $wine['description'];
+            $selectedWine->picture = substr(strrchr($wine['picture'],'/'),1);
             
-            $log->warning('LOG START');
-            $log->warning(implode('-',array_keys($wine)));
+            //Sauvegarder dans la DB le vin modifié
+            $updatedId = R::store($selectedWine);
             
-            if($result && $stmt->rowCount()!=0) {
+            //$log->warning('LOG START');
+            //$log->warning(implode('-',array_keys($wine)));
+            
+            if($updatedId === $id) {
                 $data = ['success'=>true];    
             } else {
                 $data = ['success'=>false];
