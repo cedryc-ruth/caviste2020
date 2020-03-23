@@ -54,7 +54,7 @@ $displayErrorDetails = $container->get('settings')['displayErrorDetails'];
 // Set view in Container
 $container->set('view', function() {
     return Twig::create(__DIR__ .'/../src/templates', [
-        'cache' => __DIR__ . '/../var/cache'
+        'cache' => false
     ]);
 });
 

@@ -4,4 +4,5 @@
 
 {% block content %}
 <h1>Liste des vins</h1>
+<p>{{ data }}</p>
 {% endblock %}

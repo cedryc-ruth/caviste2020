@@ -12,21 +12,12 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use App\Application\Middleware\CorsMiddleware;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use App\Application\Controllers\HomeController;
 
-return function (App $app) {    
-    $app->get('/', function (Request $request, Response $response) {
-        
-        //var_dump($this->get('view'));
-        
-        $data = 'Bonjour';
-        $title = 'Accueil';
-        //$response->getBody()->write('ok');
-        
-        return $this->get('view')->render($response, 'catalogue.php',[
-            'data' => $data,
-            'title' => $title,
-        ]);
-    });
+return function (App $app) { 
+    $app->get('/', HomeController::class.':index');
+
+    $app->get('/create-save', HomeController::class.':createSave');
     
     $app->get('/api/wines', function(Request $request, Response $response) {
         //Récupérer les données de la BD  
