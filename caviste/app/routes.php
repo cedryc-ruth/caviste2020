@@ -13,18 +13,24 @@ use App\Application\Middleware\CorsMiddleware;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
-return function (App $app) {    
+return function (App $app) {  
+     define( 'REDBEAN_MODEL_PREFIX', 'App\\Application\\Models\\' );
+             
     $app->get('/', function (Request $request, Response $response) {
         //var_dump($this->get('view'));die;
-        define( 'REDBEAN_MODEL_PREFIX', '' );
                 
         $title = 'Liste des vins';
         $data = "Bonjour avec Twig et ça marche!";
         
+        $vin = R::load('wine',30);
+        $vin->name = 'Bouteille';
+        $vin->year = 2019;
+        R::store($vin);         //OK car year n'est pas null
+        
         $vin = R::load('wine',31);
         $vin->name = 'Bouteille';
         $vin->year = null;
-        R::store($vin);
+        //R::store($vin);         //Echéc car year est null (voir Models/Wine)
         
         return $this->get('view')->render($response, 'Wine/index.html.twig',[
             'title' => $title,
