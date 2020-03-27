@@ -18,22 +18,12 @@ class WineController extends BaseController {
        
        //Définir ou récupérer les données
         $title = 'Liste des vins';
-        $data = "Bonjour avec Twig et ça marche!";
         
-        $vin = R::load('wine',30);
-        $vin->name = 'Bouteille';
-        $vin->year = 2019;
-        R::store($vin);         //OK car year n'est pas null
-        
-        $vin = R::load('wine',31);
-        $vin->name = 'Bouteille';
-        $vin->year = null;
-        //R::store($vin);         //Echéc car year est null (voir Models/Wine)
+        $vins = R::findAll('wine');
         
         return $view->render($response, 'Wine/index.html.twig',[
             'title' => $title,
-            'data' => $data,
-            'vin' => $vin,
+            'vins' => $vins,
         ]);
    }
    

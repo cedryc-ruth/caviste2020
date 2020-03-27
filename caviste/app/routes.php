@@ -17,8 +17,10 @@ use App\Application\Controllers\WineController;
 return function (App $app) {  
      define( 'REDBEAN_MODEL_PREFIX', 'App\\Application\\Models\\' );
              
-    $app->get('/', WineController::class.':index');
-    $app->get('/show/{id}', WineController::class.':show');
+    $app->get('/', WineController::class.':index')
+            ->setname('home');
+    $app->get('/show/{id}', WineController::class.':show')
+            ->setname('show');
     
     $app->get('/api/wines', function(Request $request, Response $response) {
         //Récupérer les données de la BD  

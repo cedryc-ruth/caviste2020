@@ -4,11 +4,112 @@
 {% block title %}Liste des vins{% endblock%}
 
 {% block content %}
-<h1>{{ title|upper }}</h1>
-<p>{{ data }}</p>
-<div>{{ vin }}</div>
+   <!-- Start Top Bar -->
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <ul class="menu">
+          <li class="menu-text">Caviste</li>
+          <li><a href="{{ url_for('home') }}">Accueil</a></li>
+          <li><a href="#">Profil</a></li>
+        </ul>
+      </div>
+      <div class="top-bar-right">
+        <ul class="menu">
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <!-- End Top Bar -->
+
+
+    <div class="orbit" role="region" aria-label="Favorite Space Pictures" data-orbit>
+      <ul class="orbit-container">
+        <button class="orbit-previous" aria-label="previous"><span class="show-for-sr">Previous Slide</span>&#9664;</button>
+        <button class="orbit-next" aria-label="next"><span class="show-for-sr">Next Slide</span>&#9654;</button>
+        <li class="orbit-slide is-active">
+          <img src="https://placehold.it/2000x750">
+        </li>
+        <li class="orbit-slide">
+          <img src="https://placehold.it/2000x750">
+        </li>
+        <li class="orbit-slide">
+          <img src="https://placehold.it/2000x750">
+        </li>
+        <li class="orbit-slide">
+          <img src="https://placehold.it/2000x750">
+        </li>
+      </ul>
+    </div>
+
+    <div class="row column text-center">
+      <h2>Our Newest Products</h2>
+      <hr>
+    </div>
+
+    <div class="row small-up-2 large-up-4">
+        {% for vin in vins %}    
+      <div class="column">
+        <img class="thumbnail" data-id="{{ vin.id }}" src="pics/{{ vin.picture }}" width="300">
+        <h5><a href="{{ url_for('show', {'id':vin.id}) }}">{{ vin.name|slice(0, 10) }}</a></h5>
+        <p>{{ vin.year }}</p>
+        <a href="#" class="button expanded">Buy</a>
+      </div>
+        {% endfor %}
+    </div>
+
+    <hr>
 {% endblock %}
 
 {% block footer %}
     <p>&copy; EPFC - 2020</p>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    $( function() {
+      $( "#dialog" ).hide();
+
+      $('img.thumbnail').on('click', function() {
+        const idWine = $(this).data('id');
+        const img = this;
+          
+        //Récupérer les données du vin (requête Ajax vers l'API)
+        $.getJSON('/api/wines/'+idWine, function(data) {
+            if(data[0].id!=0){
+                if($( "#dialog" ).attr('title')) {
+                    $( "#dialog" ).attr('title',data[0].name);
+                } else {
+                    $('.ui-dialog-titlebar .ui-dialog-title').html(data[0].name);
+                }
+            
+                $("#dialog img.vin-picture").attr('src',img.src);
+                $("#dialog img.vin-picture").attr('alt',img.alt);
+                $("#dialog p.vin-country span").html(data[0].country);
+                $("#dialog p.vin-region span").html(data[0].region);
+                $("#dialog p.vin-grapes span").html(data[0].grapes);
+                $("#dialog p.vin-year span").html(data[0].year);
+                $("#dialog p.vin-description span").html(data[0].description);
+            }
+        });
+        
+        $( "#dialog" ).dialog({
+            width: 600
+        });
+      });
+    } );
+</script>
+
+<div id="dialog" title="Basic dialog">
+    <div style="float: left">
+        <img class="vin-picture" src="" alt="">
+    </div>
+    <div>
+        <p class="vin-country"><strong>Country:</strong> <span></span></p>
+        <p class="vin-region"><strong>Region:</strong> <span></span></p>
+        <p class="vin-grapes"><strong>Grapes:</strong> <span></span></p>
+        <p class="vin-year"><strong>Year:</strong> <span></span></p>
+        <p class="vin-description"><strong>Description:</strong> <span></span></p>
+    </div>
+</div>
 {% endblock %}
