@@ -36,7 +36,7 @@ $container = $containerBuilder->build();
 //Ajout de Twig view
 $container->set('view', function() {
     return Twig::create(__DIR__.'/../src/templates', [
-        'cache' => __DIR__.'/../cache',
+        'cache' => __DIR__.'/../var/cache',
         'auto_reload' => true,
         'debug' => true
     ]);
