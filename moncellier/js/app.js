@@ -1,3 +1,35 @@
+function deleteWine() {
+    //Récupérer les données du formulaire et les transférer l'objet wine
+    let idWine = document.getElementById('idWine').value;
+ 
+    const options = {
+        'method': 'DELETE',
+        'mode': 'cors',
+        'headers': {
+            'content-type': 'application/json; charset=utf-8'
+        }
+    };
+    
+    const fetchURL = '/wines/'+idWine;
+    
+    fetch(apiURL + fetchURL, options).then(function(response) {
+        if(response.ok) {
+            response.json().then(function(data){
+                console.log(data);
+                
+                //Mettre à jour la liste des vins
+                wines = wines.filter(wine => wine.id != idWine);
+                
+                //Réafficher la liste des vins
+                showListe(wines);
+                
+                //Réinitialiser le formulaire
+                newWine();
+            });
+        }
+    });
+}
+
 function saveWine() {
     //Création d'un objet wine
     let wine = {};
@@ -46,6 +78,23 @@ function saveWine() {
             response.json().then(function(data){
                 console.log(data);
                 
+                //Mettre à jour la liste des vins (soit ajouter, soit modifier)
+                wines = wines.filter(vin => vin.id != wine.id);
+                
+                if(method=='POST') {
+                    //Récupérer l'id du vin créé
+                    wine.id = data.id;
+
+                    //Afficher l'id du nouveau vin dans le formulaire
+                    let input = document.getElementById('idWine');
+                    input.value = wine.id;
+                }
+                
+                //Ajouter le nouveau vin dans la liste
+                wines.push(wine);
+                
+                //Réafficher la liste des vins
+                showListe(wines);
             });
         }
     });
@@ -195,5 +244,8 @@ window.onload = function() {
     
     let btSave = document.getElementById('btSave');
     btSave.addEventListener('click', () => saveWine());
+    
+    let btDelete = document.getElementById('btDelete');
+    btDelete.addEventListener('click', () => deleteWine());
 };
 

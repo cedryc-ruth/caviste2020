@@ -34,6 +34,15 @@ $repositories($containerBuilder);
 // Build PHP-DI Container instance
 $container = $containerBuilder->build();
 
+//Ajout de Twig view
+$container->set('view', function() {
+    return Twig::create(__DIR__.'/../src/templates', [
+        'cache' => __DIR__.'/../var/cache',
+        'auto_reload' => true,
+        'debug' => true
+    ]);
+});
+
 // Instantiate the app
 AppFactory::setContainer($container);
 $app = AppFactory::create();

@@ -1,0 +1,32 @@
+{# empty Twig template #}
+<!DOCTYPE html>
+<html class="no-js" lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Caviste - {% block title %}{% endblock %}</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- Foundation CSS -->
+<link rel="stylesheet" href="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/motion-ui/2.0.3/motion-ui.min.css">
+
+<!-- jQuery UI -->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+</head>
+<body>
+    <main>{% block content %}{% endblock %}</main>
+    <footer>{% block footer %}{% endblock %}</footer>
+    
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/motion-ui/1.2.3/motion-ui.min.js"></script>
+    
+    
+    <script>
+      $(document).foundation();
+    </script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    
+    {% block javascript %}{% endblock %}
+</body>
+</html>
