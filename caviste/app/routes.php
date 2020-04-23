@@ -246,9 +246,7 @@ return function (App $app) {
         $group->get('/{id}', ViewUserAction::class);
     });
     
-    $app->options('/{routes:.+}', function(Request $request, Response $response, array $args) {
-        return $response;
-    });
+
 
 };
 
